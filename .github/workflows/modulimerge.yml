@@ -22,7 +22,7 @@ jobs:
           curl -fsSL "https://cvsweb.openbsd.org/cgi-bin/cvsweb/~checkout~/src/usr.bin/ssh/moduli-gen/moduli.{3072,4096,6144,7680,8192}" >> /tmp/moduli.tmp
           echo "# Generated at ${{ github.event.repository.updated_at}} from ${{ github.repositoryUrl }}" > ./moduli
           echo "# Time Type Tests Tries Size Generator Modulus" >> ./moduli
-          awk '$5 >= 3071' ./moduli.tmp | grep -vE '^$|#'| sort -u >> ./moduli
+          awk '$5 >= 3071' /tmp/moduli.tmp | grep -vE '^$|#'| sort -u >> ./moduli
           rm -v /tmp/moduli.tmp
           head -n5 ./moduli
 
