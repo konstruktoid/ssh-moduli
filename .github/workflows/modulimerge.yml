@@ -22,7 +22,7 @@ jobs:
         run: echo CURRENT_DATE=$(date +'%Y%m%d') >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        uses: actions/checkout@2036a08e25fa78bbd946711a407b529a0a1204bf # v2.3.2
         with:
           ref: ${{ github.head_ref }}
 
