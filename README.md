@@ -3,7 +3,7 @@
 This repository contains a GitHub Action that fetches the moduli
 files from OpenSSH on a weekly basis and merges them into one.
 
-The file contains only moduli of size 3071 or larger.
+The file contains only moduli of size 4096 or larger.
 
 See [.github/workflows/modulimerge.yml](https://github.com/konstruktoid/ssh-moduli/blob/main/.github/workflows/modulimerge.yml)
 for details.
