@@ -28,14 +28,14 @@ jobs:
 
       - name: Install openssh-client
         run: |
-          sudo apt-get update
-          sudo apt-get install --assume-yes openssh-client
+          sudo apt-get install --assume-yes --no-install-recommends --update openssh-client
 
       - name: Generate moduli file
         run: |
           set -eu -o pipefail
           curl -fvsSL "https://raw.githubusercontent.com/openssh/openssh-portable/master/moduli" | grep -v '^#' > /tmp/moduli.tmp
-          curl -fvsSL "https://cvsweb.openbsd.org/cgi-bin/cvsweb/~checkout~/src/usr.bin/ssh/moduli-gen/moduli.{4096,6144,7680,8192}" >> /tmp/moduli.tmp
+          # curl -fvsSL "https://cvsweb.openbsd.org/cgi-bin/cvsweb/~checkout~/src/usr.bin/ssh/moduli-gen/moduli.{4096,6144,7680,8192}" >> /tmp/moduli.tmp
+          curl -fvsSL 'https://cvsweb.openbsd.org/cgi-bin/cvsweb/~checkout~/src/usr.bin/ssh/moduli-gen/moduli.4096' | grep -v '^#' >> /tmp/moduli.tmp
           echo "# Generated at ${{ env.CURRENT_DATE }} from ${{ github.repositoryUrl }}" > ./moduli
           echo "# Timestamp Type Tests Trials Size Generator Modulus" >> ./moduli
           awk '$5 >= 4096' /tmp/moduli.tmp | grep -vE '^$|#'| sort -u >> ./moduli
