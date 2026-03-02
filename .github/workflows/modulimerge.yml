@@ -66,11 +66,14 @@ jobs:
           }
 
       - name: Upload moduli artifact
+        if: ${{ github.ref_name == 'main' }}
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: moduli
           path: ./moduli
 
-      - uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7.1.0
+      - name: Commit and push moduli file
+        uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7.1.0
+        if: ${{ github.ref_name == 'main' }}
         with:
           commit_message: Updated moduli file - ${{ env.CURRENT_DATE }}

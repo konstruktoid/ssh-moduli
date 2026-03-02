@@ -1,0 +1,45 @@
+---
+name: Moduli 6144 bits
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 4 * * */5"
+permissions:
+  contents: read
+jobs:
+  Generate:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@a90bcbc6539c36a85cdfeb73f7e2f433735f215b # v2.15.0
+        with:
+          egress-policy: audit
+
+      - name: Set current date as env variable
+        run: echo CURRENT_DATE=$(date +'%Y%m%d') >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Install openssh-client
+        run: |
+          sudo apt-get install --assume-yes --no-install-recommends --update openssh-client
+
+      - name: Generate 6144 bits moduli file
+        run: |
+          set -eu -o pipefail
+          mkdir -p /tmp/moduli
+          time ssh-keygen -M generate -O bits=6144 /tmp/moduli/moduli.6144-candidates
+          time ssh-keygen -M screen -f /tmp/moduli/moduli.6144-candidates /tmp/moduli/moduli.6144
+
+      - name: Upload moduli artifact
+        if: ${{ github.ref_name == 'main' }}
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: moduli.6144
+          path: /tmp/moduli/moduli.6144
