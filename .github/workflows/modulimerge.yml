@@ -28,24 +28,38 @@ jobs:
 
       - name: Install openssh-client
         run: |
-          sudo apt-get update
-          sudo apt-get install --assume-yes openssh-client
+          sudo apt-get install --assume-yes --no-install-recommends --update openssh-client
 
-      - name: Generate moduli file
+      - name: Generate 4096 bits moduli file
         run: |
           set -eu -o pipefail
-          curl -fvsSL "https://raw.githubusercontent.com/openssh/openssh-portable/master/moduli" | grep -v '^#' > /tmp/moduli.tmp
-          curl -fvsSL "https://cvsweb.openbsd.org/cgi-bin/cvsweb/~checkout~/src/usr.bin/ssh/moduli-gen/moduli.{4096,6144,7680,8192}" >> /tmp/moduli.tmp
+          mkdir -p /tmp/moduli
+          time ssh-keygen -M generate -O bits=4096 /tmp/moduli/moduli.4096-candidates
+          time ssh-keygen -M screen -f /tmp/moduli/moduli.4096-candidates /tmp/moduli/moduli.4096
+
+      - name: Download OpenSSH moduli file
+        run: |
+          set -eu -o pipefail
+          curl -fsSL "https://raw.githubusercontent.com/openssh/openssh-portable/master/moduli" | grep -v '^#' > /tmp/moduli.tmp
+
+      - name: Merge moduli files
+        run: |
+          set -eu -o pipefail
+          grep -vE '^$|#' /tmp/moduli/moduli.4096 >> /tmp/moduli.tmp
+
+      - name: Process moduli file
+        run: |
+          set -eu -o pipefail
           echo "# Generated at ${{ env.CURRENT_DATE }} from ${{ github.repositoryUrl }}" > ./moduli
           echo "# Timestamp Type Tests Trials Size Generator Modulus" >> ./moduli
-          awk '$5 >= 4096' /tmp/moduli.tmp | grep -vE '^$|#'| sort -u >> ./moduli
+          awk '$5 >= 4095' /tmp/moduli.tmp | grep -vE '^$|#'| sort -u >> ./moduli
           rm -v /tmp/moduli.tmp
           head -n5 ./moduli
 
       - name: Verify moduli file
         run: |
           set -eu -o pipefail
-          grep -vE '^#|^$' moduli | shuf -n10 | ssh-keygen -M screen /tmp/mod.test
+          grep -vE '^#|^$' moduli | shuf -n30 | ssh-keygen -M screen /tmp/mod.test
           grep "$(shuf -n5 /tmp/mod.test | awk '{print $NF}')" moduli || {
             echo "Moduli file verification failed"
             exit 1
