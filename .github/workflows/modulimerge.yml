@@ -73,7 +73,7 @@ jobs:
           path: ./moduli
 
       - name: Commit and push moduli file
-        uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7.1.0
+        uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7.2.0
         if: ${{ github.ref_name == 'main' }}
         with:
           commit_message: Updated moduli file - ${{ env.CURRENT_DATE }}
