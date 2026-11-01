@@ -9,6 +9,7 @@ permissions:
 jobs:
   Generate:
     runs-on: ubuntu-latest
+    timeout-minutes: 330
     permissions:
       actions: read
       contents: write
@@ -35,7 +36,8 @@ jobs:
           set -eu -o pipefail
           mkdir -p /tmp/moduli
           time ssh-keygen -M generate -O bits=4096 /tmp/moduli/moduli.4096-candidates
-          time ssh-keygen -M screen -f /tmp/moduli/moduli.4096-candidates /tmp/moduli/moduli.4096
+          # OpenSSH 10 sieves ~8x more candidates; screening them all exceeds the 6h job limit.
+          time ssh-keygen -M screen -O lines=200000 -f /tmp/moduli/moduli.4096-candidates /tmp/moduli/moduli.4096
 
       - name: Download OpenSSH moduli file
         run: |
